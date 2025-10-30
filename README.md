@@ -7,9 +7,9 @@ Die gerelle Idee ist einmal am Tag createFundifyPages() aus der Klasse PageHandl
 Es gibt eine Methode alle/eine existierende(n) Seiten upzudaten -> class PageBuilder
 Updates einzelner Seiten funktionieren ueber ein UI-Fragment das im '...'-Menu im entsprechenden Space fuer Leute mit edit-permissions auftaucht - verwendet das GET-request in fundify/rest\_update
 
-[UI-Fragment config](https://github.com/busstop1982/confluence-fundify/blob/main/ui_frag.png)
+![UI-Fragment config](https://github.com/busstop1982/confluence-fundify/blob/main/ui_frag.png)
 
-[custom REST-endpoint config](https://github.com/busstop1982/confluence-fundify/blob/main/rest_endpoint.png)
+![custom REST-endpoint config](https://github.com/busstop1982/confluence-fundify/blob/main/rest_endpoint.png)
 
 Als Alternative hab ich einen Button in die Template Seite eingebaut ders ermoeglichen soll fuer die Seite ein Update zu machen. Der setzt ein request an einen custom endpoint von ScriptRunner ab (siehe fundify/rest\_conditional.groovy und fundify/rest\_update.groovy) und der loest dann die updateSpecificPage Methode aus. Ich glaub nicht dass ich den funktional hatte, aber das letzte Mal hab ich vor einem halben/dreiviertel Jahr dran gearbeitet und war am herumtesten. Und mittlerweile braucht die API credentials, dh ich kann grad nichts ausprobieren ^^
 
