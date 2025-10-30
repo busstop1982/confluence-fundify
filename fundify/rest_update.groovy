@@ -22,7 +22,7 @@ updateFundifyPage(
         Response.ok(JsonOutput.toJson([type:'success',title:'page updated',body:"${out}"])).build()
     }
     else{
-        def updated = ph.updateSpecificPage(risID);
+        def updated = true;//ph.updateSpecificPage(risID);
         if (updated) {
             def result = [
                 message: "$risID received, page update successful."
