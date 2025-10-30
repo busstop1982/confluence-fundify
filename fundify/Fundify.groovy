@@ -38,7 +38,7 @@ class Fundify {
                     jsonInfo = slurpy.parseText(foo)
                 }
             }
-        } catch (Exception e) {log.error('callresult: '+e)}
+        } catch (Exception e) {log.error('callresult: '+e.toString())}
 
         JSONArray obj = new JSONArray(jsonInfo)
         return obj
