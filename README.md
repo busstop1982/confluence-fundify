@@ -5,7 +5,8 @@ Die gerelle Idee ist einmal am Tag createFundifyPages() aus der Klasse PageHandl
 
 ### Seiten Udpates:
 Es gibt eine Methode alle/eine existierende(n) Seiten upzudaten -> class PageBuilder
-Updates einzelner Seiten funktionieren ueber ein UI-Fragment das im '...'-Menu im entsprechenden Space fuer Leute mit edit-permissions auftaucht - verwendet das GET-request in fundify/rest\_update
+
+Updates einzelner Seiten funktionieren ueber ein UI-Fragment das im '...'-Menu im entsprechenden Space fuer Leute mit edit-permissions auftaucht - verwendet das GET-request in fundify/rest\_update. Hier die config fuers UI-Fragment und den custom Endpoint:
 
 ![UI-Fragment config](https://github.com/busstop1982/confluence-fundify/blob/main/ui_frag.png)
 
