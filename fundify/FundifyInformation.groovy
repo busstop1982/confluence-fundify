@@ -46,7 +46,7 @@ class FundifyInformation{
     }
 
     public String toString(){
-        return "${getKey()} (${formattedValue.getClass()}//${value.getClass()}): $formattedValue\n"
+        return "${getKey()} (${formattedValue.getClass()}//${value.getClass()}):\n $formattedValue\n"
     }
 
     private void setID(String id){
@@ -128,7 +128,7 @@ class FundifyInformation{
     private void parseWebsite(){
         String buffer = ''
         for ( line : (this.value as JSONArray).iterator() ){
-            buffer += this.wrapHyperLink(line as String)
+            buffer += this.wrapHyperLink((line as String).replace("&","&amp;"))
         }
         this.formattedValue = buffer
     }
@@ -235,6 +235,11 @@ class FundifyInformation{
         this.formattedValue = String.format(formatter,(this.value as String).toInteger())
     }
 
+    private void escapeChars() {
+        this.formattedValue = this.formattedValue.replace("&","&amp;")
+        this.formattedValue = this.formattedValue.replace("<","&lt;")
+    }
+
     public void parse(){
         switch (keyword){
             case 'call_website':
@@ -257,9 +262,13 @@ class FundifyInformation{
                 break;
             case 'funder_name':
             case 'call_name':
+                filterLanguage2()
+                parseToList()
+                break;
             case 'call_description':
                 filterLanguage2()
                 parseToList()
+                escapeChars()
                 break;
             case 'min_project_duration':
             case 'max_project_duration':
@@ -285,4 +294,3 @@ class FundifyInformation{
         }
     }
 }
-

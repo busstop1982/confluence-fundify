@@ -51,21 +51,20 @@ class PageBuilder {
                 .build()
         }
         catch (Exception e){log.error e}
-        
         Content nc
         try {
-            //assert contentService.validator().validateCreate(newcontent) : "Can't create new page."
+            assert contentService.validator().validateCreate(newcontent) : "Can't create new page."
             nc = contentService.create(newcontent)
         }
-        catch (Exception e){log.error e}
+        catch (Exception e){log.error('at create page: '+e)}
         try {
             def bar = h.addPropertyToContent(nc,'callID',call.getCallId())
         }
-        catch (Exception e){log.error e}
+        catch (Exception e){log.error('at add property: '+e)}
         try {
             def foo = h.addLabels(nc.getId(), labels)
         }
-        catch (Exception e){log.error e}
+        catch (Exception e){log.error('at set labels: '+e)}
     }
 
     public void update(FundifyCall call){
@@ -104,5 +103,3 @@ class PageBuilder {
         catch (Exception e){log.error e}
     }
 }
-
-

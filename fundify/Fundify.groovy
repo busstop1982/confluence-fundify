@@ -1,11 +1,10 @@
 package fundify
 
+import com.atlassian.confluence.json.json.Json
 import fundify.FundifyCall
 import java.sql.Array
 import groovy.json.JsonSlurper
-import groovyx.net.http.HTTPBuilder
-import groovyx.net.http.ContentType
-import groovyx.net.http.Method
+import groovyx.net.http.*
 import java.net.URL
 import org.json.*
 import groovy.util.logging.Log4j
@@ -13,9 +12,30 @@ import groovy.util.logging.Log4j
 @Log4j
 class Fundify {
     String generalFundifyURL
+    String apiToken
 
     public Fundify(String universityRisId = 'ris:UE:orgunit:3000'){
-        this.generalFundifyURL = "https://fundify.arisnet.ac.at/api/ris-synergy/funding/v1/annotated-calls/university/${universityRisId}"
+        this.generalFundifyURL = "https://fundify-staging.arisnet.ac.at/api/ris-synergy/funding/v1/annotated-calls/university/${universityRisId}"
+        this.setApiToken()
+    }
+
+    void setApiToken(){
+        def tokenReply
+        JsonSlurper slurp = new JsonSlurper()
+        HTTPBuilder tokenrequest = new HTTPBuilder("https://id.arisnet.ac.at/realms/fundify/protocol/openid-connect/token")
+        String clientId = "your_client_here"
+        String clientSecret = "your_secret_here"
+        tokenrequest.request(Method.POST, ContentType.URLENC){
+                            body = [grant_type:'client_credentials', client_id:clientId, client_secret:clientSecret]
+                            response.success = { resp, HashMap json ->
+                                //json is a hashmap with all the information stored in the key - hence the following abomination                                
+                                tokenReply = slurp.parseText(json.keySet().toString())
+                                this.apiToken = tokenReply["access_token"][0]
+                            }
+                            response.failure = { HttpResponseDecorator resp ->
+                                log.error resp.entity.content.text
+                            }
+                        }          
     }
 
     private String extractRisId(JSONObject apiCall){
@@ -26,20 +46,19 @@ class Fundify {
     }
 
     JSONArray callResultUni() {
-        def urmel = new URL(generalFundifyURL)
         def slurpy = new JsonSlurper()
-        def http = new HTTPBuilder()
+        def http = new HTTPBuilder(this.generalFundifyURL)
+        http.headers["Authorization"] = "Bearer ${this.apiToken}"
         def jsonInfo = new JSONObject()
-        try {
-            http.request(urmel, Method.GET, ContentType.JSON) {
-                uri.path = urmel.getPath()
-                response.success = { groovyx.net.http.HttpResponseDecorator resp ->
-                    String foo = resp.entity.content.text
-                    jsonInfo = slurpy.parseText(foo)
-                }
+        http.request(Method.GET, ContentType.JSON) {
+            response.success = { HttpResponseDecorator resp ->
+                String foo = resp.entity.content.text
+                jsonInfo = slurpy.parseText(foo)
             }
-        } catch (Exception e) {log.error('callresult: '+e.toString())}
-
+            response.failure = { HttpResponseDecorator resp ->
+                log.error resp.entity.content.text
+            }
+        }
         JSONArray obj = new JSONArray(jsonInfo)
         return obj
     }
@@ -73,16 +92,18 @@ class Fundify {
     @param wantedCallId format: ris:<funder_acronym>:funding:<callID>
     */
     FundifyCall getOneCall(String wantedCallId){
-        def urmel = new URL(this.generalFundifyURL+'/call/'+wantedCallId)
         def slurpy = new JsonSlurper()
-        def http = new HTTPBuilder()
+        def http = new HTTPBuilder(this.generalFundifyURL+'/call/'+wantedCallId.replace(' ','%20'))
+        http.headers["Authorization"] = "Bearer ${this.apiToken}"
         def jsonInfo = new JSONObject()
         try {
-            http.request(urmel, Method.GET, ContentType.JSON) {
-                uri.path = urmel.getPath()
-                response.success = { groovyx.net.http.HttpResponseDecorator resp ->
+            http.request(Method.GET, ContentType.JSON) {
+                response.success = { HttpResponseDecorator resp ->
                     String foo = resp.entity.content.text
                     jsonInfo = slurpy.parseText(foo)
+                }
+                response.failure = { HttpResponseDecorator resp ->
+                    log.error resp.entity.content.text
                 }
             }
         } catch (Exception e) {log.error e}
